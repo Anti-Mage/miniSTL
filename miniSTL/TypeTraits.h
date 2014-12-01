@@ -1,7 +1,7 @@
 #ifndef __TYPETRAITS_H__
 #define __TYPETRAITS_H__
 
-namespace mySTL{
+namespace miniSTL{
 	struct _true_type{};
 	struct _false_type{};
 

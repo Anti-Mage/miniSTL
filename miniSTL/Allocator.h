@@ -7,7 +7,7 @@
 #include <cassert>
 #include <new>
 
-namespace mySTL{
+namespace miniSTL{
 
 	template<class T>
 	class allocator{

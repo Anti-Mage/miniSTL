@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 
-namespace mySTL{
+namespace miniSTL{
 	/*
 	**空间配置器，以字节为单位分配内存
 	**函数仅提供给内部使用，不提供给外部使用

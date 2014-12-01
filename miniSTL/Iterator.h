@@ -1,7 +1,7 @@
 #ifndef __ITERATOR_H__
 #define __ITERATOR_H__
 
-namespace mySTL{
+namespace miniSTL{
 	struct input_iterator_tag{};
 	struct output_iterator_tag{};
 	struct forward_iterator_tag : public input_iterator_tag{};

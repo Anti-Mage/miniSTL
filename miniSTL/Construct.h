@@ -5,7 +5,7 @@
 #include "TypeTraits.h"
 
 
-namespace mySTL{
+namespace miniSTL{
 
 	template<class T1, class T2>
 	inline void construct(T1 *ptr1, const T2& value){
@@ -30,7 +30,7 @@ namespace mySTL{
 
 	template<class ForwardInterator>
 	inline void destroy(ForwardInterator first, ForwardInterator last){
-		typedef typename _type_traits<T>::is_POD_type is_POD_type;
+		typedef typename _type_traits<T>::is_POD_type is_POD_type;			//T应该是有问题的
 		_destroy(first, last, is_POD_type);
 	}
 }
