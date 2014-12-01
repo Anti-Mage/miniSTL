@@ -29,6 +29,7 @@ namespace miniSTL{
 		static void construct(T *ptr);
 		static void construct(T *ptr, const T& value);
 		static void destroy(T *ptr);
+		static void destroy(T *first, T *last);
 	};
 
 	template<class T>
@@ -66,6 +67,12 @@ namespace miniSTL{
 	template<class T>
 	void allocator<T>::destroy(T *ptr){
 		ptr->~T();
+	}
+
+	template<class T>
+	void allocator<T>::destroy(T *first, T *last){
+		for (; first != last; ++first)
+			first->~T();
 	}
 }
 
