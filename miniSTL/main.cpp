@@ -6,6 +6,7 @@
 #include "Allocator.h"
 #include "Iterator.h"
 #include "UninitializedFunctions.h"
+#include "Vector.h"
 
 
 using namespace std;
@@ -28,7 +29,7 @@ int main(){
 
 	}
 
-	auto p = miniSTL::allocator<int>::allocate(100);
+	/*auto p = miniSTL::allocator<int>::allocate(100);
 	miniSTL::uninitialized_fill(p, p + 90, 123);
 	copy(p, p + 100, ostream_iterator<int>(cout, " ")); cout << endl;
 
@@ -41,7 +42,17 @@ int main(){
 	copy(p, p + 100, ostream_iterator<int>(cout, " ")); cout << endl;
 	for (auto n : array){
 		cout << n << ' ';
-	}
+	}*/
 
+	/*int array[3] = {1, 2, 3};
+	miniSTL::vector<int> v(array, array + 3);
+
+	cout << *(v.begin()) << endl;
+	cout << v.back() << endl;
+	cout << *(++v.begin()) << endl;
+	cout << *(--v.end()) << endl;*/
+
+	miniSTL::vector<int> v1(3);
+	miniSTL::vector<int> v2(100);
 	return 0;
 }

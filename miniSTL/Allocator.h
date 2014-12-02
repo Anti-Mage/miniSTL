@@ -50,8 +50,8 @@ namespace miniSTL{
 
 	template<class T>
 	void allocator<T>::deallocate(void *ptr, size_t n){
-		assert(n != 0)
-		alloc::deallocate(static_cast<void *>(ptr), sizeof(T)* n);
+		assert(n != 0);
+		alloc::deallocate(static_cast<void *>(ptr), n * sizeof(T) );
 	}
 
 	template<class T>

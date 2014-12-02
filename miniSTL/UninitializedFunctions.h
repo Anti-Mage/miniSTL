@@ -14,7 +14,7 @@ namespace miniSTL{
 
 	/********************************************************copy***************************************************************/
 	template<class InputIterator, class ForwardIterator>
-	ForwardIterator _unintialized_copy_aux(InputIterator first, InputIterator last, ForwardIterator result, _true_type);
+	ForwardIterator _uninitialized_copy_aux(InputIterator first, InputIterator last, ForwardIterator result, _true_type);
 
 	template<class InputIterator, class ForwardIterator>
 	ForwardIterator _uninitialized_copy_aux(InputIterator first, InputIterator last, ForwardIterator result, _false_type);
@@ -27,7 +27,7 @@ namespace miniSTL{
 	}
 
 	template<class InputIterator, class ForwardIterator>
-	ForwardIterator _unintialized_copy_aux(InputIterator first, InputIterator last, ForwardIterator result, _true_type){
+	ForwardIterator _uninitialized_copy_aux(InputIterator first, InputIterator last, ForwardIterator result, _true_type){
 		memcpy(result, first, (last - first) * sizeof(*first));			//如果只POD数据，则直接进行内存拷贝
 
 		return result + (last - first);									//返回表示拷贝的数据最后一个数据后面一位的迭代器

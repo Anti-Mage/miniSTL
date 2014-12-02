@@ -14,6 +14,24 @@ namespace miniSTL{
 		typedef _false_type		is_POD_type;
 	};
 
+	template<class T>
+	struct _type_traits<T *>{
+		typedef _true_type		has_trivial_constructor;
+		typedef _true_type		has_trivial_copy_constructor;
+		typedef _true_type		has_trivial_assignment_operator;
+		typedef _true_type		has_trivial_destructor;
+		typedef _true_type		is_POD_type;
+	};
+
+	template<class T>
+	struct _type_traits<const T *>{
+		typedef _true_type		has_trivial_constructor;
+		typedef _true_type		has_trivial_copy_constructor;
+		typedef _true_type		has_trivial_assignment_operator;
+		typedef _true_type		has_trivial_destructor;
+		typedef _true_type		is_POD_type;
+	};
+
 	template<>
 	struct _type_traits<bool>{
 		typedef _true_type		has_trivial_constructor;
@@ -151,24 +169,6 @@ namespace miniSTL{
 
 	template<>
 	struct _type_traits<long double>{
-		typedef _true_type		has_trivial_constructor;
-		typedef _true_type		has_trivial_copy_constructor;
-		typedef _true_type		has_trivial_assignment_operator;
-		typedef _true_type		has_trivial_destructor;
-		typedef _true_type		is_POD_type;
-	};
-
-	template<class T>
-	struct _type_traits<T*>{
-		typedef _true_type		has_trivial_constructor;
-		typedef _true_type		has_trivial_copy_constructor;
-		typedef _true_type		has_trivial_assignment_operator;
-		typedef _true_type		has_trivial_destructor;
-		typedef _true_type		is_POD_type;
-	};
-
-	template<class T>
-	struct _type_traits<const T*>{
 		typedef _true_type		has_trivial_constructor;
 		typedef _true_type		has_trivial_copy_constructor;
 		typedef _true_type		has_trivial_assignment_operator;
