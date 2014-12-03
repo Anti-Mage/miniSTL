@@ -8,7 +8,6 @@
 #include "Iterator.h"
 #include "TypeTraits.h"
 
-#include <cstring>
 
 namespace miniSTL{
 

@@ -9,7 +9,7 @@ namespace miniSTL{
 	
 	namespace {
 		template<class T>
-		class viter : public iterator < random_access_iterator<T, ptrdiff_t>, T > {
+		class viter : public miniSTL::iterator <miniSTL::random_access_iterator_tag, T > {
 		private :
 			T *ptr_;
 			T* getPtr(){ return ptr_; }
@@ -18,6 +18,8 @@ namespace miniSTL{
 			explicit viter(T *ptr) : ptr_(ptr){}
 			viter(const viter& vit);
 			viter& operator=(const viter &vit);
+
+			operator void*(){ return ptr_; }
 
 			T& operator*(){ return *ptr_; }
 			T* operator->(){ return ptr_; }
@@ -114,8 +116,7 @@ namespace miniSTL{
 		vector(vector &&v);
 		vector& operator=(const vector& v);
 		~vector(){
-			dataAllocator::destroy(start_, finish_);
-			dataAllocator::deallocate(start_, endofStorage_ - start_);
+			destroyAndDeallocateAll();
 		}
 
 		iterator begin(){ return iterator(start_); }
@@ -149,12 +150,20 @@ namespace miniSTL{
 		}
 
 		iterator insert(iterator position, const value_type& value);
-		void insert(iterator position, size_type n, const value_type& value);
+		void insert(iterator position,const size_type& n, const value_type& value);
 		template<class InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last);
 
 		iterator erase(iterator position);
 		iterator erase(iterator first, iterator last);
+
+	private:
+		void destroyAndDeallocateAll(){
+			if (capacity() != 0){
+				dataAllocator::destroy(start_, finish_);
+				dataAllocator::deallocate(start_, endofStorage_ - start_);
+			}
+		}
 
 	private:
 		void allocateAndFillN(const size_type n, const value_type& value){
@@ -172,15 +181,23 @@ namespace miniSTL{
 		}
 
 		template<class InputIterator>
-		void vector_aux(InputIterator first, InputIterator last, _false_type){
+		void vector_aux(InputIterator first, InputIterator last, std::false_type){
 			allocateAndCopy(first, last);
+		}
+
+		template<class Integer>
+		void vector_aux(Integer n, Integer value, std::true_type){
+			allocateAndFillN(n, value);
 		}
 
 		template<class InputIterator>
-		void vector_aux(InputIterator first, InputIterator last, _true_type){
-			allocateAndCopy(first, last);
-		}
+		void insert_aux(iterator position, InputIterator first, InputIterator last, std::false_type);
+		template<class Integer>
+		void insert_aux(iterator position, Integer n, Integer value, std::true_type);
 
+		template<class InputIterator>
+		void reallocateAndCopy(iterator position, InputIterator first, InputIterator last);
+		void reallocateAndFillN(iterator position, const size_type& n, const value_type& val);
 
 	};
 
@@ -197,8 +214,9 @@ namespace miniSTL{
 	template<class T, class Alloc>
 	template<class InputIterator>
 	vector<T, Alloc>::vector(InputIterator first, InputIterator last){
-		typename _type_traits< iterator_traits<InputIterator>::value_type>::is_POD_type is_POD_type;
-		vector_aux(first, last, is_POD_type);
+		/*typename _type_traits< iterator_traits<InputIterator>::value_type>::is_POD_type is_POD_type;*/
+		vector_aux(first, last, typename std::is_integral<InputIterator>::type());
+		//allocateAndCopy(first, last);
 	}
 
 	template<class T, class Alloc>
@@ -218,7 +236,6 @@ namespace miniSTL{
 	vector<T, Alloc>& vector<T, Alloc>::operator=(const vector& v){
 		if (this != &v){
 			allocateAndCopy(v.start_, v.finish_);
-
 		}
 
 		return *this;
@@ -240,6 +257,70 @@ namespace miniSTL{
 		}
 
 		return viter<T>(first);
+	}
+
+
+	template<class T, class Alloc>
+	template<class InputIterator>
+	void vector<T, Alloc>::reallocateAndCopy(iterator position, InputIterator first, InputIterator last){
+		difference_type oldCapacity = endOfStorage_ - start_;
+		oldCapacity = oldCapacity ? oldCapacity : 1;
+		difference_type newCapacity = oldCapacity + std::max(oldCapacity, last - first);
+
+		T *newStart = dataAllocator::allocate(newCapacity);
+		T *newEndOfStorage = newStart + newCapacity;
+		T *newFinish = uninitialized_copy(begin(), position, newStart);
+		newFinish = uninitialized_copy(first, last, newFinish);
+		newFinish = uninitialized_copy(position, end(), newFinish);
+
+		destroyAndDeallocateAll();
+		start_ = newStart;
+		finish_ = newFinish;
+		endOfStorage_ = newEndOfStorage;
+	}
+	template<class T, class Alloc>
+	template<class InputIterator>
+	void vector<T, Alloc>::insert_aux(iterator position,
+		InputIterator first, InputIterator last,
+		std::false_type){
+		difference_type locationLeft = endOfStorage_ - finish_; // the size of left storage
+		difference_type locationNeed = last - first;
+
+		if (locationLeft >= locationNeed){
+			auto tempPtr = end() - 1;
+			for (; tempPtr - position >= 0; --tempPtr){//move the [position, finish_) back
+				*(tempPtr + locationNeed) = *tempPtr;
+			}
+			uninitialized_copy(first, last, position);
+			finish_ += locationNeed;
+		}
+		else{
+			reallocateAndCopy(position, first, last);
+		}
+	}
+	template<class T, class Alloc>
+	template<class Integer>
+	void vector<T, Alloc>::insert_aux(iterator position, Integer n, Integer value, std::true_type){
+		vector<value_type> v(n, value);
+		insert(position, v.begin(), v.end());
+	}
+	template<class T, class Alloc>
+	template<class InputIterator>
+	void vector<T, Alloc>::insert(iterator position, InputIterator first, InputIterator last){
+		insert_aux(position, first, last, typename std::is_integral<InputIterator>::type());
+	}
+	template<class T, class Alloc>
+	void vector<T, Alloc>::insert(iterator position, const size_type& n, const value_type& val){
+		insert_aux(position, n, val, typename std::is_integral<value_type>::type());
+	}
+	template<class T, class Alloc>
+	typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(iterator position, const value_type& val){
+		insert(position, 1, val);
+		return position;
+	}
+	template<class T, class Alloc>
+	void vector<T, Alloc>::push_back(const value_type& value){
+		insert(end(), value);
 	}
 }
 

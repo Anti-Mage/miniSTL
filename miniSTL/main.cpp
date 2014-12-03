@@ -53,6 +53,6 @@ int main(){
 	cout << *(--v.end()) << endl;*/
 
 	miniSTL::vector<int> v1(3);
-	miniSTL::vector<int> v2(100);
+	miniSTL::vector<int> v2(3, 100);
 	return 0;
 }
